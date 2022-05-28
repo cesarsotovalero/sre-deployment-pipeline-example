@@ -70,6 +70,27 @@ Smart choice :) So each micro-service's developers should provide Dockerfiles in
 
 ## Proposed deployment architecture
 
+![deployment-arcthitecture](pictures/deployment-architecture.png)
+
+Based on the thoughts above, here is the proposed deployment architecture. I am not sure if this is too abstract or too detailed. Here are some explanations about the figure.
+
+A deployment procedure starts from the bottom-left corner of the figure, when developers create a commit or a PR to their project repo. Here we can use tools like Jenkins or Google Cloud Build (if the infrastructure is running on top of GCP) to set up CI/CD pipelines to build and test a micro-service. Since the application is running on K8s, the CI/CD pipeline builds micro-service Docker images and pushes them to a Docker registery, such as DockerHub and GCP Container Registry.
+
+Before updating the running services using new images, it is good to scan these images for vulnerabilities.
+
+Based on tag name, branch, or specific flags in a commit message, we can deploy the updated micro-services to a specific running environment, like testing environment, staging environment, or production environment.
+
+In the figure, the production running environment is selected for demonstrating a bit more details, though this part may not belong to the **deployment architecture** per se. The point I would like to mention here is that we still need to consider the production environment when designing the deployment architecture.
+
+Based on the production running environment, a deployment manifest should include the following components in a K8s yaml file.
+
+- K8s deployments
+- K8s services which expose ports of different micro-services
+- K8s ingress
+- K8s horizontal pod autoscaler
+
+Additionally, consider that the system should be fast and highly available, the same deployment procedure should be done at different regions and zones (using GCP's terms as an example).
+
 ## TODO
-- [ ] architecture with diagrams and explanations
+- [x] architecture with diagrams and explanations
 - [ ] K8s manifest files
