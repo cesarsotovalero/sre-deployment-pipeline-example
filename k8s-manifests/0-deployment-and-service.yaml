@@ -1,0 +1,359 @@
+#################################################
+#                  frontend                     #
+#################################################
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: frontend-container
+          image: gluckzhang/frontend:v1.0.0
+          ports:
+          - containerPort: 8080
+        env:
+        - name: SOME_ENV
+          value: "SOME_VALUE"
+        # I think these probes need to be designed by the developers of this micro-service
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+---
+# if the services are running on cloud platforms such as GCP, LoadBalancer might be available here
+# assume ingress-nginx is also used by the cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-external
+  namespace: ingress-nginx
+spec:
+  type: LoadBalancer
+  selector:
+    app: ingress-nginx-controller
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443
+---
+
+#################################################
+# deployment and service for each micro-service #
+#################################################
+
+# product-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+spec:
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: product-service-container
+        image: gluckzhang/product:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SOME_ENV
+          value: "SOME_VALUE"
+        # I think these probes need to be designed by the developers of this micro-service
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+spec:
+  type: ClusterIP
+  selector:
+    app: product-service
+  ports:
+  - name: grpc
+    port: 5000
+    targetPort: 8080
+---
+
+# user-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: user-service-container
+        image: gluckzhang/user:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SOME_ENV
+          value: "SOME_VALUE"
+        # I think these probes need to be designed by the developers of this micro-service
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  type: ClusterIP
+  selector:
+    app: user-service
+  ports:
+  - name: grpc
+    port: 5000
+    targetPort: 8080
+---
+
+# payment-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+spec:
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: payment-service-container
+        image: gluckzhang/payment:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SOME_ENV
+          value: "SOME_VALUE"
+        # I think these probes need to be designed by the developers of this micro-service
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+spec:
+  type: ClusterIP
+  selector:
+    app: payment-service
+  ports:
+  - name: grpc
+    port: 5000
+    targetPort: 8080
+---
+
+# db-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-service
+spec:
+  selector:
+    matchLabels:
+      app: db-service
+  template:
+    metadata:
+      labels:
+        app: db-service
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: db-service-container
+        image: gluckzhang/db:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SOME_ENV
+          value: "SOME_VALUE"
+        # I think these probes need to be designed by the developers of this micro-service
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  type: ClusterIP
+  selector:
+    app: db-service
+  ports:
+  - name: grpc
+    port: 5000
+    targetPort: 8080
+---
+
+# db-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-service
+spec:
+  selector:
+    matchLabels:
+      app: db-service
+  template:
+    metadata:
+      labels:
+        app: db-service
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: db-service-container
+        image: gluckzhang/db:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SOME_ENV
+          value: "SOME_VALUE"
+        # I think these probes need to be designed by the developers of this micro-service
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["...", "..."]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  type: ClusterIP
+  selector:
+    app: db-service
+  ports:
+  - name: grpc
+    port: 5000
+    targetPort: 8080
+---

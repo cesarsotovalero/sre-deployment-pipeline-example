@@ -1,0 +1,24 @@
+#################################################
+#                  ingress                      #
+#################################################
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # if letsencrypt is applied
+spec:
+  tls:
+  - hosts:
+    - www.happyshopping.com
+    secretName: frontend-tls
+  rules:
+  - host: www.happyshopping.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: frontend
+            port:
+              number: 80

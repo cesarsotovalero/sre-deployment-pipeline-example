@@ -91,6 +91,10 @@ Based on the production running environment, a deployment manifest should includ
 
 Additionally, consider that the system should be fast and highly available, the same deployment procedure should be done at different regions and zones (using GCP's terms as an example).
 
+## Kubernetes manifests
+
+In rolder `k8s-manifests` I have provided an example of Kubernetes manifests for the proposed deployment. There are 3 `.yaml` files in total. The prefix numbers indicate the order of deploying them (e.g., `kubectl apply -f 0-deployment-and-service.yaml`). In these manifests, I assume that the target Kubernetes cluster has been installed with ingress-nginx. Due to lacking knowledge of external payment services such as Visa and Mastercard, I am not sure if there is any specific configuration needed in the manifests. Maybe it is only needed at the infrastructure level such as firewall, etc.
+
 ## TODO
 - [x] architecture with diagrams and explanations
-- [ ] K8s manifest files
+- [x] K8s manifest files
